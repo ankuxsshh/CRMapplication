@@ -1,142 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | Dreamsland Realty</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-  <div class="flex min-h-screen">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r shadow-lg">
-      <div class="p-6 text-center font-bold text-xl border-b">Dreamsland Realty CRM</div>
-      <nav class="p-4 space-y-2">
-        <a href="#dashboard" class="block px-4 py-2 rounded hover:bg-blue-100">Dashboard</a>
-        <a href="#properties" class="block px-4 py-2 rounded hover:bg-blue-100">Properties</a>
-        <a href="#agents" class="block px-4 py-2 rounded hover:bg-blue-100">Agents</a>
-        <a href="#customers" class="block px-4 py-2 rounded hover:bg-blue-100">Customers</a>
-        <a href="#reports" class="block px-4 py-2 rounded hover:bg-blue-100">Reports</a>
-        <a href="#settings" class="block px-4 py-2 rounded hover:bg-blue-100">Settings</a>
-      </nav>
-    </aside>
+{% extends "base.html" %}
 
-    <!-- Main Dashboard -->
-    <main class="flex-1 p-6">
-      <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+{% block title %}Admin Dashboard | Dreamsland Realty{% endblock %}
 
-      <!-- Metrics Section -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white p-4 shadow rounded-xl">
-          <div class="text-gray-500">Total Properties</div>
-          <div class="text-2xl font-bold">1,350</div>
-        </div>
-        <div class="bg-white p-4 shadow rounded-xl">
-          <div class="text-gray-500">Total Agents</div>
-          <div class="text-2xl font-bold">58</div>
-        </div>
-        <div class="bg-white p-4 shadow rounded-xl">
-          <div class="text-gray-500">Assigned Properties</div>
-          <div class="text-2xl font-bold">780</div>
-        </div>
-        <div class="bg-white p-4 shadow rounded-xl">
-          <div class="text-gray-500">Active Customers</div>
-          <div class="text-2xl font-bold">912</div>
-        </div>
-      </div>
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-      <!-- Charts & Graphs -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white p-4 shadow rounded-xl col-span-2">
-          <h2 class="text-xl font-semibold mb-2">Monthly Property Uploads</h2>
-          <div class="h-64 bg-gray-200 flex items-center justify-center rounded-lg">
-            <!-- Insert chart here -->
-            <span class="text-gray-500">[Chart Placeholder]</span>
-          </div>
-        </div>
-        <div class="bg-white p-4 shadow rounded-xl">
-          <h2 class="text-xl font-semibold mb-2">Agents Performance</h2>
-          <div class="h-64 bg-gray-200 flex items-center justify-center rounded-lg">
-            <!-- Insert pie chart here -->
-            <span class="text-gray-500">[Pie Chart Placeholder]</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tables Section -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white p-4 shadow rounded-xl">
-          <h2 class="text-xl font-semibold mb-4">Recent Properties</h2>
-          <table class="w-full text-sm text-left">
-            <thead class="bg-gray-100">
-              <tr>
-                <th class="p-2">ID</th>
-                <th class="p-2">Title</th>
-                <th class="p-2">Agent</th>
-                <th class="p-2">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="p-2">P-101</td>
-                <td class="p-2">Sunset Villa</td>
-                <td class="p-2">John Doe</td>
-                <td class="p-2 text-green-600">Active</td>
-              </tr>
-              <tr>
-                <td class="p-2">P-102</td>
-                <td class="p-2">Oceanview Flat</td>
-                <td class="p-2">Jane Smith</td>
-                <td class="p-2 text-yellow-500">Pending</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="bg-white p-4 shadow rounded-xl">
-          <h2 class="text-xl font-semibold mb-4">Active Agents</h2>
-          <table class="w-full text-sm text-left">
-            <thead class="bg-gray-100">
-              <tr>
-                <th class="p-2">ID</th>
-                <th class="p-2">Name</th>
-                <th class="p-2">Properties</th>
-                <th class="p-2">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="p-2">A-201</td>
-                <td class="p-2">John Doe</td>
-                <td class="p-2">32</td>
-                <td class="p-2 text-green-600">Active</td>
-              </tr>
-              <tr>
-                <td class="p-2">A-202</td>
-                <td class="p-2">Jane Smith</td>
-                <td class="p-2">27</td>
-                <td class="p-2 text-green-600">Active</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    </main>
+<!-- Metrics Section -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white p-4 shadow rounded-xl">
+    <div class="text-gray-500">Total Properties</div>
+    <div class="text-2xl font-bold">{{ total_properties }}</div>
   </div>
-</body>
-<style>
-  body {
-    font-family: 'Montserrat', sans-serif;
-  }
-  a:hover {
-    background-color: #ebf8ff;
-  }
-  .bg-blue-100:hover {
-    background-color: #ebf8ff;
-  }
-  .bg-gray-200 {
-    background-color: #edf2f7;
-  }
-</style>
-</html>
+  <div class="bg-white p-4 shadow rounded-xl">
+    <div class="text-gray-500">Total Agents</div>
+    <div class="text-2xl font-bold">58</div>
+  </div>
+  <div class="bg-white p-4 shadow rounded-xl">
+    <div class="text-gray-500">Assigned Properties</div>
+    <div class="text-2xl font-bold">780</div>
+  </div>
+  <div class="bg-white p-4 shadow rounded-xl">
+    <div class="text-gray-500">Active Customers</div>
+    <div class="text-2xl font-bold">912</div>
+  </div>
+</div>
+
+<!-- Charts & Graphs Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+  <!-- Monthly Bar Chart -->
+  <div class="bg-white p-4 shadow rounded-xl col-span-2">
+    <h2 class="text-xl font-semibold mb-2">{{ month }} Property Uploads</h2>
+    <canvas id="monthlyBarChart" class="w-full h-64"></canvas>
+  </div>
+
+  <!-- Pie Chart -->
+  <div class="bg-white p-4 shadow rounded-xl">
+    <h2 class="text-xl font-semibold mb-2">Weekly Distribution ({{ month }})</h2>
+    <canvas id="weeklyPieChart" class="w-full h-64"></canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Data from Django context
+  const weekLabels = {{ week_ranges| safe }};
+  const weekData = {{ week_counts| safe }};
+
+  // Bar Chart
+  const barCtx = document.getElementById('monthlyBarChart').getContext('2d');
+  new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: weekLabels,
+      datasets: [{
+        label: 'Properties Uploaded',
+        data: weekData,
+        backgroundColor: 'rgb(50, 62, 152, 0.8)',
+        borderColor: 'rgb(50, 62, 152, 0.8)',
+        borderWidth: 1,
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Pie Chart
+  const pieCtx = document.getElementById('weeklyPieChart').getContext('2d');
+  new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+      labels: weekLabels,
+      datasets: [{
+        data: weekData,
+        backgroundColor: [
+          '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1',
+          '#14b8a6', '#eab308', '#f97316', '#8b5cf6', '#22c55e'
+        ]
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+</script>
+{% endblock %}

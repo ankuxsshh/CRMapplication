@@ -1,20 +1,53 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends "base.html" %}
+
+{% block title %}Properties | Dreamsland Realty{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{%static 'css/property.css'%}">
+<!-- Custom CSS -->
+<style>
+    .image-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
 
-<div class="container py-5">
-    <h1 class="text-dark d-flex justify-content-center my-5">My Property List</h1>
+    .overlay-box {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5));
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    }
 
+    .image-wrapper:hover .overlay-box {
+        opacity: 1;
+    }
+
+    .property-img {
+        height: 250px;
+        object-fit: cover;
+    }
+
+    body {
+        font-family: 'Montserrat', sans-serif;
+        background-color: #fdfdfd;
+    }
+</style>
+
+<div class="container py-2">
+    <h1 class="text-3xl font-bold mb-3">Properties</h1>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for property in properties %}
         <div class="col">
             <div class="card h-100 shadow-sm position-relative overflow-hidden">
                 <div class="image-wrapper position-relative">
                     {% if property.images %}
-                    <img src="{{ property.images.0 }}" class="card-img-top property-img" alt="{{ property.name }}"
-                        style="height: 220px; object-fit: cover;">
+                    <img src="{{ property.images.0 }}" alt="{{ property.name }}" class="card-img-top property-img">
                     {% else %}
                     <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
                         style="height: 220px;">
@@ -22,21 +55,26 @@
                     </div>
                     {% endif %}
 
-                    <!-- Overlay content -->
+                    <!-- Overlay -->
                     <div class="overlay-box">
-                        <div class="overlay-top">
-                            <div class="text-left">
+                        <div class="overlay-top d-flex justify-content-between align-items-center px-3 py-2">
+                            <div class="text-start">
                                 <h5 class="mb-1 fw-bold text-white">₹{{ property.price|floatformat:"0g" }}</h5>
                                 <p class="mb-0 text-white small">{{ property.name }}</p>
                             </div>
-                            <div class="text-end">
-                                <span class="badge bg-light text-dark small">{{ property.location }}</span>
-                            </div>
+                            <span class="badge bg-light text-dark small">{{ property.location }}</span>
                         </div>
-                        <div class="overlay-bottom text-end">
-                            <a href="" class="btn btn-outline-danger text-light">
+                        <div class="overlay-bottom d-flex justify-content-end gap-2 p-2">
+                            <!-- Update -->
+                            <button class="btn btn-outline-light btn-sm update-btn" data-property='{{ property|safe }}'>
                                 <i class="fas fa-edit me-1"></i> Update
-                            </a>
+                            </button>
+
+                            <!-- Delete -->
+                            <button class="btn btn-outline-danger btn-sm delete-btn"
+                                data-property-id="{{ property.propertyId }}">
+                                <i class="fas fa-trash me-1"></i> Delete
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -51,7 +89,216 @@
         </div>
         {% endfor %}
     </div>
-
-
 </div>
-{%endblock%}
+
+<!-- Update Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="updateForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Update Property</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <input type="hidden" id="propertyId" name="id">
+                    <div class="col-md-6">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Type</label>
+                        <input type="text" class="form-control" id="type" name="type" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Subtype</label>
+                        <input type="text" class="form-control" id="subtype" name="subtype" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">BHK</label>
+                        <input type="number" class="form-control" id="bhk" name="bhk" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Price</label>
+                        <input type="number" class="form-control" id="price" name="price" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Square Feet</label>
+                        <input type="text" class="form-control" id="sqft" name="sqft" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Property</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Action Scripts -->
+<script>
+    // DOM Ready Handler
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize modal
+        const updateModal = new bootstrap.Modal(document.getElementById('updateModal'));
+
+        // Set up delete buttons
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const propertyId = this.getAttribute('data-property-id');
+                if (propertyId) {
+                    deleteProperty(propertyId);
+                }
+            });
+        });
+
+        // Set up update buttons
+        document.querySelectorAll('.update-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                try {
+                    const propertyData = JSON.parse(this.getAttribute('data-property'));
+                    openUpdateModal(propertyData, updateModal);
+                } catch (e) {
+                    showAlert('error', 'Failed to parse property data');
+                    console.error('Parse error:', e);
+                }
+            });
+        });
+
+        // Form submission handler
+        document.getElementById('updateForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            updateProperty();
+        });
+    });
+
+    // Delete Property Function
+    async function deleteProperty(propertyId) {
+        if (!propertyId) return;
+
+        if (!confirm('Are you sure you want to permanently delete this property?')) {
+            return;
+        }
+
+        try {
+            showAlert('info', 'Deleting property...', true);
+
+            const response = await fetch(`/delete_property/${propertyId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showAlert('success', result.message);
+                // Refresh after 1.5 seconds
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                throw new Error(result.message || 'Failed to delete property');
+            }
+        } catch (error) {
+            showAlert('error', error.message);
+            console.error('Delete Error:', error);
+        }
+    }
+
+    // Update Property Modal Handler
+    function openUpdateModal(property, modal) {
+        if (!property || !modal) return;
+
+        // Populate form fields
+        document.getElementById('propertyId').value = property.propertyId || '';
+        document.getElementById('name').value = property.name || '';
+        document.getElementById('location').value = property.location || '';
+        document.getElementById('type').value = property.type || '';
+        document.getElementById('subtype').value = property.subtype || '';
+        document.getElementById('bhk').value = property.bhk || 0;
+        document.getElementById('price').value = property.price || 0;
+        document.getElementById('sqft').value = property.sqft || 0;
+        document.getElementById('description').value = property.propertyDescription || '';
+
+        // Show modal
+        modal.show();
+    }
+
+    // Update Property Function
+    async function updateProperty() {
+        const form = document.getElementById('updateForm');
+        const formData = new FormData(form);
+        const jsonData = {};
+
+        // Convert FormData to JSON
+        formData.forEach((value, key) => {
+            jsonData[key] = value;
+        });
+
+        try {
+            showAlert('info', 'Updating property...', true);
+
+            const response = await fetch('/update_property/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(jsonData)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showAlert('success', result.message);
+                // Hide modal and refresh
+                bootstrap.Modal.getInstance(document.getElementById('updateModal')).hide();
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                throw new Error(result.message || 'Failed to update property');
+            }
+        } catch (error) {
+            showAlert('error', error.message);
+            console.error('Update Error:', error);
+        }
+    }
+
+    // Alert Notification Function
+    function showAlert(type, message, persistent = false) {
+        const alertBox = document.createElement('div');
+        alertBox.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        alertBox.style.top = '20px';
+        alertBox.style.right = '20px';
+        alertBox.style.zIndex = '9999';
+        alertBox.style.minWidth = '300px';
+        alertBox.role = 'alert';
+
+        alertBox.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+        document.body.appendChild(alertBox);
+
+        if (!persistent) {
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+                setTimeout(() => alertBox.remove(), 150);
+            }, 5000);
+        }
+    }
+</script>
+{% endblock %}
