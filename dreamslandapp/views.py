@@ -183,7 +183,6 @@ def update_property(request):
         }, status=405)
 
     try:
-        # Parse and validate request data
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
@@ -193,27 +192,24 @@ def update_property(request):
                 'message': 'Invalid JSON data received'
             }, status=400)
 
-        # Required fields validation
         required_fields = ['id', 'name', 'location', 'price']
-        missing_fields = [field for field in required_fields if not data.get(field)]
-        
+        missing_fields = [f for f in required_fields if not data.get(f)]
         if missing_fields:
             return JsonResponse({
                 'success': False,
                 'error': 'missing_fields',
-                'message': f'Missing required fields: {", ".join(missing_fields)}'
+                'message': f"Missing fields: {', '.join(missing_fields)}"
             }, status=400)
 
-        # Prepare API payload
         payload = {
             "propertyId": data['id'],
             "name": data['name'],
             "location": data['location'],
             "type": data.get('type', ''),
             "subtype": data.get('subtype', ''),
-            "bhk": data.get('bhk', 0),
-            "price": data['price'],
-            "sqft": data.get('sqft', 0),
+            "bhk": int(data.get('bhk', 0)),
+            "price": float(data.get('price')),
+            "sqft": data.get('sqft', ''),
             "propertyDescription": data.get('description', ''),
             "plotArea": data.get('plotArea', ''),
             "unit": data.get('unit', ''),
@@ -221,7 +217,7 @@ def update_property(request):
             "imageUrls": data.get('images', [])
         }
 
-        # Call external API
+        # Send to external API
         api_url = "https://api-fxz7qcfy4q-uc.a.run.app/upload"
         response = requests.post(api_url, json=payload, timeout=10)
         response.raise_for_status()
@@ -233,18 +229,15 @@ def update_property(request):
         })
 
     except requests.exceptions.RequestException as req_err:
-        error_msg = f"API request failed: {str(req_err)}"
-        if hasattr(req_err, 'response') and req_err.response:
-            error_msg += f" - {req_err.response.text}"
         return JsonResponse({
             'success': False,
             'error': 'api_error',
-            'message': error_msg
-        }, status=req_err.response.status_code if hasattr(req_err, 'response') else 500)
+            'message': f"API error: {str(req_err)}"
+        }, status=500)
 
     except Exception as e:
         return JsonResponse({
             'success': False,
             'error': 'server_error',
-            'message': f"An unexpected error occurred: {str(e)}"
+            'message': f"Unexpected error: {str(e)}"
         }, status=500)

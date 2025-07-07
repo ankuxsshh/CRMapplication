@@ -3,25 +3,25 @@
 {% block title %}Admin Dashboard | Dreamsland Realty{% endblock %}
 
 {% block content %}
-<h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+<h1 class="text-3xl font-bold mb-6 py-3">Admin Dashboard</h1>
 
 <!-- Metrics Section -->
 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
   <div class="bg-white p-4 shadow rounded-xl">
-    <div class="text-gray-500">Total Properties</div>
-    <div class="text-2xl font-bold">{{ total_properties }}</div>
+    <div class="text-gray-500"> Total Properties</div>
+    <div class="text-2xl font-bold"><i class="fas fa-home mr-3 text-dark-500"></i> {{ total_properties }}</div>
   </div>
   <div class="bg-white p-4 shadow rounded-xl">
-    <div class="text-gray-500">Total Agents</div>
-    <div class="text-2xl font-bold">58</div>
+    <div class="text-gray-500"> Total Agents</div>
+    <div class="text-2xl font-bold"><i class="fas fa-users mr-3 text-dark-500"></i>58</div>
   </div>
   <div class="bg-white p-4 shadow rounded-xl">
-    <div class="text-gray-500">Assigned Properties</div>
-    <div class="text-2xl font-bold">780</div>
+    <div class="text-gray-500"> Assigned Properties</div>
+    <div class="text-2xl font-bold"><i class="fas fa-home mr-3 text-dark-500"></i>780</div>
   </div>
   <div class="bg-white p-4 shadow rounded-xl">
-    <div class="text-gray-500">Active Customers</div>
-    <div class="text-2xl font-bold">912</div>
+    <div class="text-gray-500"> Active Customers</div>
+    <div class="text-2xl font-bold"><i class="fas fa-users mr-3 text-dark-500"></i>912</div>
   </div>
 </div>
 
@@ -56,8 +56,8 @@
       datasets: [{
         label: 'Properties Uploaded',
         data: weekData,
-        backgroundColor: 'rgb(50, 62, 152, 0.8)',
-        borderColor: 'rgb(50, 62, 152, 0.8)',
+        backgroundColor: 'rgb(50, 62, 152, 1)',
+        borderColor: 'rgb(50, 62, 152, 1)',
         borderWidth: 1,
         borderRadius: 5
       }]

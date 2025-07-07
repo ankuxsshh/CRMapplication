@@ -40,7 +40,7 @@
 </style>
 
 <div class="container py-2">
-    <h1 class="text-3xl font-bold mb-3">Properties</h1>
+    <h1 class="text-3xl font-bold mb-6 py-3">Properties</h1>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for property in properties %}
         <div class="col">
@@ -66,12 +66,13 @@
                         </div>
                         <div class="overlay-bottom d-flex justify-content-end gap-2 p-2">
                             <!-- Update -->
-                            <button class="btn btn-outline-light btn-sm update-btn" data-property='{{ property|safe }}'>
+                            <button class="btn btn-light btn-sm update-btn"
+                                data-property="{{ property|escapejs }}">
                                 <i class="fas fa-edit me-1"></i> Update
                             </button>
 
                             <!-- Delete -->
-                            <button class="btn btn-outline-danger btn-sm delete-btn"
+                            <button class="btn btn-danger btn-sm delete-btn"
                                 data-property-id="{{ property.propertyId }}">
                                 <i class="fas fa-trash me-1"></i> Delete
                             </button>
@@ -147,82 +148,33 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Action Scripts -->
 <script>
-    // DOM Ready Handler
     document.addEventListener('DOMContentLoaded', function () {
-        // Initialize modal
         const updateModal = new bootstrap.Modal(document.getElementById('updateModal'));
 
-        // Set up delete buttons
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const propertyId = this.getAttribute('data-property-id');
-                if (propertyId) {
-                    deleteProperty(propertyId);
-                }
-            });
-        });
-
-        // Set up update buttons
+        // Update button click handler
         document.querySelectorAll('.update-btn').forEach(btn => {
             btn.addEventListener('click', function () {
                 try {
-                    const propertyData = JSON.parse(this.getAttribute('data-property'));
+                    const propertyJson = this.getAttribute('data-property');
+                    const propertyData = JSON.parse(propertyJson);
                     openUpdateModal(propertyData, updateModal);
                 } catch (e) {
-                    showAlert('error', 'Failed to parse property data');
-                    console.error('Parse error:', e);
+                    console.error("Parse error:", e);
+                    showAlert('error', 'Invalid property data format');
                 }
             });
         });
 
-        // Form submission handler
+        // Handle form submission
         document.getElementById('updateForm').addEventListener('submit', function (e) {
             e.preventDefault();
             updateProperty();
         });
     });
 
-    // Delete Property Function
-    async function deleteProperty(propertyId) {
-        if (!propertyId) return;
-
-        if (!confirm('Are you sure you want to permanently delete this property?')) {
-            return;
-        }
-
-        try {
-            showAlert('info', 'Deleting property...', true);
-
-            const response = await fetch(`/delete_property/${propertyId}/`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                showAlert('success', result.message);
-                // Refresh after 1.5 seconds
-                setTimeout(() => location.reload(), 1500);
-            } else {
-                throw new Error(result.message || 'Failed to delete property');
-            }
-        } catch (error) {
-            showAlert('error', error.message);
-            console.error('Delete Error:', error);
-        }
-    }
-
-    // Update Property Modal Handler
+    // Modal population
     function openUpdateModal(property, modal) {
-        if (!property || !modal) return;
-
-        // Populate form fields
         document.getElementById('propertyId').value = property.propertyId || '';
         document.getElementById('name').value = property.name || '';
         document.getElementById('location').value = property.location || '';
@@ -232,25 +184,21 @@
         document.getElementById('price').value = property.price || 0;
         document.getElementById('sqft').value = property.sqft || 0;
         document.getElementById('description').value = property.propertyDescription || '';
-
-        // Show modal
         modal.show();
     }
 
-    // Update Property Function
+    // AJAX update request
     async function updateProperty() {
         const form = document.getElementById('updateForm');
         const formData = new FormData(form);
         const jsonData = {};
 
-        // Convert FormData to JSON
         formData.forEach((value, key) => {
             jsonData[key] = value;
         });
 
         try {
             showAlert('info', 'Updating property...', true);
-
             const response = await fetch('/update_property/', {
                 method: 'POST',
                 headers: {
@@ -264,19 +212,18 @@
 
             if (result.success) {
                 showAlert('success', result.message);
-                // Hide modal and refresh
                 bootstrap.Modal.getInstance(document.getElementById('updateModal')).hide();
                 setTimeout(() => location.reload(), 1500);
             } else {
-                throw new Error(result.message || 'Failed to update property');
+                throw new Error(result.message);
             }
         } catch (error) {
             showAlert('error', error.message);
-            console.error('Update Error:', error);
+            console.error('Update error:', error);
         }
     }
 
-    // Alert Notification Function
+    // Show alert
     function showAlert(type, message, persistent = false) {
         const alertBox = document.createElement('div');
         alertBox.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
@@ -285,20 +232,18 @@
         alertBox.style.zIndex = '9999';
         alertBox.style.minWidth = '300px';
         alertBox.role = 'alert';
-
         alertBox.innerHTML = `
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
-
         document.body.appendChild(alertBox);
-
         if (!persistent) {
             setTimeout(() => {
                 alertBox.classList.remove('show');
                 setTimeout(() => alertBox.remove(), 150);
-            }, 5000);
+            }, 4000);
         }
     }
 </script>
+
 {% endblock %}
